@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 長押し処理
   // =========================================
 
-  const HOLD_TIME = 1000;
+  const HOLD_TIME = 500;
 
   let holding = false;
   let startTime = 0;
