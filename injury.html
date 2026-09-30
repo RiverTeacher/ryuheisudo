@@ -6,6 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+  <script src="common.js"></script>
 <title>ケガ</title>
 <style>
 :root{
@@ -279,7 +280,7 @@ footer{
 
   </div>
 
-  <footer>※ 表示内容は負傷データ（JSON）に基づく演出です。</footer>
+  <footer>※ 医学的根拠はありません。全部主観です。</footer>
 </div>
 
 
@@ -308,16 +309,6 @@ footer{
 }
 </script>
 
-<!-- common.js のロードを試みる（無くても動作継続） -->
-<script>
-(function () {
-  var s = document.createElement("script");
-  s.src = "common.js";
-  s.async = false;
-  s.onerror = function () { /* common.js が無い場合は無視 */ };
-  document.head.appendChild(s);
-})();
-</script>
 
 <script>
 (function () {
