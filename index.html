@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- キャッシュ禁止 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<!-- 検索キーワード -->
+<meta name="keywords" content="須藤龍平, 須藤 龍平">
+<meta name="author" content="須藤龍平">
+
+<title>須藤龍平</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-jp@latest/japanese-400-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-jp@latest/japanese-300-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/share-tech-mono@latest/latin-400-normal.css">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    color: #3a4a5c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    overflow-x: hidden;
+    position: relative;
+
+    /* ゆっくり流れるグラデーション背景 */
+    background: linear-gradient(
+      120deg,
+      #ffffff 0%,
+      #eaf6fc 20%,
+      #ffffff 40%,
+      #e3f2fa 60%,
+      #ffffff 80%,
+      #eef8fd 100%
+    );
+    background-size: 300% 300%;
+    animation: gradientFlow 22s ease-in-out infinite;
+  }
+
+  @keyframes gradientFlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* ===== 12/15 限定: 虹色背景 ===== */
+  body.rainbow-day {
+    background: linear-gradient(
+      120deg,
+      #ffd9e3 0%,
+      #ffedc8 20%,
+      #d8f5d0 40%,
+      #cdeffd 60%,
+      #e2d9fa 80%,
+      #ffd9e3 100%
+    );
+    background-size: 400% 400%;
+    animation: rainbowFlow 14s ease-in-out infinite;
+  }
+
+  @keyframes rainbowFlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* ふわふわ漂う水色の光 */
+  body::before,
+  body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  body::before {
+    width: 45vmax;
+    height: 45vmax;
+    top: -12vmax;
+    left: -10vmax;
+    background: radial-gradient(circle, rgba(150, 210, 240, 0.35) 0%, transparent 70%);
+    animation: floatA 16s ease-in-out infinite;
+  }
+
+  body::after {
+    width: 50vmax;
+    height: 50vmax;
+    bottom: -15vmax;
+    right: -12vmax;
+    background: radial-gradient(circle, rgba(120, 200, 235, 0.28) 0%, transparent 70%);
+    animation: floatB 20s ease-in-out infinite;
+  }
+
+  @keyframes floatA {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(8vmax, 5vmax) scale(1.15); }
+  }
+
+  @keyframes floatB {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(-6vmax, -4vmax) scale(1.1); }
+  }
+
+  /* 12/15は光の色相が回転して虹っぽく */
+  @keyframes hueSpin {
+    from { filter: blur(80px) hue-rotate(0deg); }
+    to   { filter: blur(80px) hue-rotate(360deg); }
+  }
+
+  body.rainbow-day::before {
+    animation: floatA 16s ease-in-out infinite, hueSpin 9s linear infinite;
+  }
+
+  body.rainbow-day::after {
+    animation: floatB 20s ease-in-out infinite, hueSpin 9s linear infinite;
+  }
+
+  /* ===== 背景のカウントダウン ===== */
+  .countdown {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: clamp(0.4rem, 2vw, 1.6rem);
+    padding-top: 14vh;
+    pointer-events: none;
+    opacity: 0.10;
+    color: #4d9cc4;
+    font-family: 'Share Tech Mono', monospace;
+    user-select: none;
+  }
+
+  .cd-segment {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .cd-num {
+    font-size: clamp(2.4rem, 11vw, 9rem);
+    line-height: 1;
+  }
+
+  .cd-label {
+    font-size: clamp(0.55rem, 1.3vw, 0.85rem);
+    letter-spacing: 0.4em;
+    padding-left: 0.4em;
+  }
+
+  .cd-colon {
+    font-size: clamp(2.4rem, 11vw, 9rem);
+    line-height: 1;
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+  }
+
+  body.rainbow-day .countdown {
+    color: #8a6bb0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    padding: 60px 40px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(173, 216, 240, 0.3);
+    border-radius: 24px;
+    box-shadow:
+      0 8px 32px rgba(135, 206, 235, 0.12),
+      0 2px 8px rgba(173, 216, 240, 0.08);
+    animation: fadeIn 1s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  h1 {
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: rgba(100, 160, 200, 0.8);
+    text-align: center;
+    margin-bottom: 56px;
+    text-transform: uppercase;
+  }
+
+  .category {
+    margin-bottom: 40px;
+  }
+
+  .category:last-child {
+    margin-bottom: 0;
+  }
+
+  .category-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    color: rgba(100, 160, 200, 0.7);
+    margin-bottom: 18px;
+    padding-left: 4px;
+    text-transform: uppercase;
+  }
+
+  .nav-link {
+    display: block;
+    position: relative;
+    padding: 14px 4px;
+    font-size: 18px;
+    font-weight: 300;
+    color: #4a5a6c;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.4s ease;
+    cursor: pointer;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    bottom: 6px;
+    height: 1.5px;
+    background: linear-gradient(
+      90deg,
+      rgba(135, 206, 235, 0.1) 0%,
+      rgba(135, 206, 235, 0.55) 40%,
+      rgba(173, 216, 240, 0.7) 70%,
+      rgba(200, 235, 250, 0.4) 100%
+    );
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .nav-link:hover {
+    color: #2c4a5c;
+  }
+
+  .nav-link:hover::after,
+  .nav-link:focus::after {
+    transform: scaleX(1);
+  }
+
+  .nav-link:active::after {
+    transform: scaleX(1);
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      rgba(100, 180, 220, 0.3) 0%,
+      rgba(100, 180, 220, 0.75) 50%,
+      rgba(135, 206, 235, 0.5) 100%
+    );
+  }
+
+  .nav-link.pressed::after {
+    transform: scaleX(1);
+  }
+
+  /* アニメーションを控えたい環境向けの配慮 */
+  @media (prefers-reduced-motion: reduce) {
+    body,
+    body::before,
+    body::after,
+    .container,
+    .cd-colon {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding: 48px 28px;
+    }
+    .nav-link {
+      font-size: 16px;
+    }
+  }
+</style>
+</head>
+<body>
+  <!-- 背景のカウントダウン（12/15まで） -->
+  <div class="countdown" aria-hidden="true">
+    <div class="cd-segment">
+      <span class="cd-num" id="cd-days">--</span>
+      <span class="cd-label">DAYS</span>
+    </div>
+    <span class="cd-colon">:</span>
+    <div class="cd-segment">
+      <span class="cd-num" id="cd-hours">--</span>
+      <span class="cd-label">HOURS</span>
+    </div>
+    <span class="cd-colon">:</span>
+    <div class="cd-segment">
+      <span class="cd-num" id="cd-mins">--</span>
+      <span class="cd-label">MINS</span>
+    </div>
+    <span class="cd-colon">:</span>
+    <div class="cd-segment">
+      <span class="cd-num" id="cd-secs">--</span>
+      <span class="cd-label">SECS</span>
+    </div>
+  </div>
+
+  <main class="container">
+    <h1>Home</h1>
+
+    <section class="category">
+      <span class="category-label">一般</span>
+      <a href="contact.html" class="nav-link">連絡先</a>
+      <a href="wallet.html" class="nav-link">ウォレットアドレス</a>
+    </section>
+
+    <section class="category">
+      <span class="category-label">ネタ</span>
+      <a href="injury.html" class="nav-link">ケガ</a>
+    </section>
+  </main>
+
+  <script>
+    const elDays  = document.getElementById('cd-days');
+    const elHours = document.getElementById('cd-hours');
+    const elMins  = document.getElementById('cd-mins');
+    const elSecs  = document.getElementById('cd-secs');
+
+    function pad(n) {
+      return String(n).padStart(2, '0');
+    }
+
+    function tick() {
+      const now = new Date();
+      let year = now.getFullYear();
+      let target = new Date(year, 11, 15, 0, 0, 0);        // 12/15 00:00
+      const endOfDay = new Date(year, 11, 15, 23, 59, 59, 999);
+
+      // 12/15 当日 → 虹色モード
+      const isRainbowDay = now >= target && now <= endOfDay;
+      document.body.classList.toggle('rainbow-day', isRainbowDay);
+
+      // 12/15 を過ぎていたら来年の 12/15 へ
+      if (now > endOfDay) {
+        target = new Date(year + 1, 11, 15, 0, 0, 0);
+      }
+
+      const diff = Math.max(0, target - now);
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor(diff / 3600000) % 24;
+      const m = Math.floor(diff / 60000) % 60;
+      const s = Math.floor(diff / 1000) % 60;
+
+      elDays.textContent  = pad(d);
+      elHours.textContent = pad(h);
+      elMins.textContent  = pad(m);
+      elSecs.textContent  = pad(s);
+    }
+
+    tick();
+    setInterval(tick, 1000);
+
+    // タッチデバイスでも線が残りやすいよう、クリック時に一時的にクラスを付与
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', function() {
+        this.classList.add('pressed');
+      });
+    });
+  </script>
+</body>
+</html>
