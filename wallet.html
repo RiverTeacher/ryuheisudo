@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+  
+<!-- キャッシュ禁止 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+
+<title>ウォレットアドレス - 須藤龍平</title>
+<script src="common.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-jp@latest/japanese-400-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-jp@latest/japanese-300-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/share-tech-mono@latest/latin-400-normal.css">
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    color: #3a4a5c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    overflow-x: hidden;
+    position: relative;
+
+    /* ゆっくり流れるグラデーション背景 */
+    background: linear-gradient(
+      120deg,
+      #ffffff 0%,
+      #eaf6fc 20%,
+      #ffffff 40%,
+      #e3f2fa 60%,
+      #ffffff 80%,
+      #eef8fd 100%
+    );
+    background-size: 300% 300%;
+    animation: gradientFlow 22s ease-in-out infinite;
+  }
+
+  @keyframes gradientFlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* ===== 12/15 限定: 虹色背景 ===== */
+  body.rainbow-day {
+    background: linear-gradient(
+      120deg,
+      #ffd9e3 0%,
+      #ffedc8 20%,
+      #d8f5d0 40%,
+      #cdeffd 60%,
+      #e2d9fa 80%,
+      #ffd9e3 100%
+    );
+    background-size: 400% 400%;
+    animation: rainbowFlow 14s ease-in-out infinite;
+  }
+
+  @keyframes rainbowFlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* ふわふわ漂う水色の光 */
+  body::before,
+  body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  body::before {
+    width: 45vmax;
+    height: 45vmax;
+    top: -12vmax;
+    left: -10vmax;
+    background: radial-gradient(circle, rgba(150, 210, 240, 0.35) 0%, transparent 70%);
+    animation: floatA 16s ease-in-out infinite;
+  }
+
+  body::after {
+    width: 50vmax;
+    height: 50vmax;
+    bottom: -15vmax;
+    right: -12vmax;
+    background: radial-gradient(circle, rgba(120, 200, 235, 0.28) 0%, transparent 70%);
+    animation: floatB 20s ease-in-out infinite;
+  }
+
+  @keyframes floatA {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(8vmax, 5vmax) scale(1.15); }
+  }
+
+  @keyframes floatB {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(-6vmax, -4vmax) scale(1.1); }
+  }
+
+  @keyframes hueSpin {
+    from { filter: blur(80px) hue-rotate(0deg); }
+    to   { filter: blur(80px) hue-rotate(360deg); }
+  }
+
+  body.rainbow-day::before {
+    animation: floatA 16s ease-in-out infinite, hueSpin 9s linear infinite;
+  }
+
+  body.rainbow-day::after {
+    animation: floatB 20s ease-in-out infinite, hueSpin 9s linear infinite;
+  }
+
+  /* ===== 背景のカウントダウン ===== */
+  .countdown {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: clamp(0.4rem, 2vw, 1.6rem);
+    padding-top: 14vh;
+    pointer-events: none;
+    opacity: 0.10;
+    color: #4d9cc4;
+    font-family: 'Share Tech Mono', monospace;
+    user-select: none;
+  }
+
+  .cd-segment {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .cd-num {
+    font-size: clamp(2.4rem, 11vw, 9rem);
+    line-height: 1;
+  }
+
+  .cd-label {
+    font-size: clamp(0.55rem, 1.3vw, 0.85rem);
+    letter-spacing: 0.4em;
+    padding-left: 0.4em;
+  }
+
+  .cd-colon {
+    font-size: clamp(2.4rem, 11vw, 9rem);
+    line-height: 1;
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+  }
+
+  body.rainbow-day .countdown {
+    color: #8a6bb0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    padding: 60px 40px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(173, 216, 240, 0.3);
+    border-radius: 24px;
+    box-shadow:
+      0 8px 32px rgba(135, 206, 235, 0.12),
+      0 2px 8px rgba(173, 216, 240, 0.08);
+    animation: fadeIn 1s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  h1 {
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: rgba(100, 160, 200, 0.8);
+    text-align: center;
+    margin-bottom: 48px;
+    text-transform: uppercase;
+  }
+
+  .category {
+    margin-bottom: 32px;
+  }
+
+  .category:last-child {
+    margin-bottom: 0;
+  }
+
+  /* アイコンと通貨ラベルのレイアウト */
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-left: 2px;
+  }
+
+  .crypto-logo {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+
+  .category-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    color: rgba(100, 160, 200, 0.85);
+    text-transform: uppercase;
+  }
+
+  /* アドレス表示用カード */
+  .address-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(173, 216, 240, 0.45);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: #3a4a5c;
+    line-height: 1.4;
+    word-break: break-all;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: all;
+  }
+
+  .address-card:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(135, 206, 235, 0.8);
+    box-shadow: 0 4px 14px rgba(135, 206, 235, 0.18);
+    transform: translateY(-1px);
+  }
+
+  .address-card:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(135, 206, 235, 0.12);
+  }
+
+  /* コピー完了ツールチップ */
+  .toast {
+    position: absolute;
+    top: -28px;
+    right: 8px;
+    background: rgba(58, 74, 92, 0.92);
+    color: #ffffff;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body,
+    body::before,
+    body::after,
+    .container,
+    .cd-colon {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding: 48px 24px;
+    }
+    .address-card {
+      font-size: 12px;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="countdown" aria-hidden="true">
+    <div class="cd-segment">
+      <span class="cd-num" id="cd-days">--</span>
+      <span class="cd-label">DAYS</span>
+    </div>
+    <span class="cd-colon">:</span>
+    <div class="cd-segment">
+      <span class="cd-num" id="cd-hours">--</span>
+      <span class="cd-label">HOURS</span>
+    </div>
+    <span class="cd-colon">:</span>
+    <div class="cd-segment">
+      <span class="cd-num" id="cd-mins">--</span>
+      <span class="cd-label">MINS</span>
+    </div>
+    <span class="cd-colon">:</span>
+    <div class="cd-segment">
+      <span class="cd-num" id="cd-secs">--</span>
+      <span class="cd-label">SECS</span>
+    </div>
+  </div>
+
+  <main class="container">
+    <h1>暗号資産用アドレス</h1>
+
+    <!-- BTC -->
+    <section class="category">
+      <div class="category-header">
+        <!-- BTC SVG Logo -->
+        <svg class="crypto-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="16" fill="#F7931A"/>
+          <path d="M22.28 12.82c.32-2.13-.97-3.27-3.13-4.03l.64-2.57-1.56-.39-.62 2.5c-.41-.1-.83-.2-1.25-.29l.63-2.52-1.56-.39-.64 2.57c-.34-.08-.68-.16-1.01-.24l-2.15-.54-.42 1.67s1.16.27 1.14.28c.63.16.75.58.73.91l-.73 2.94c.04.01.1.03.16.06l-.16-.04-1.02 4.1c-.08.19-.28.47-.73.36.02.02-1.14-.28-1.14-.28l-.78 1.8 2.03.51c.38.1.75.19 1.12.28l-.65 2.62 1.56.39.64-2.57c.43.12.84.22 1.25.32l-.64 2.56 1.56.39.65-2.61c2.66.5 4.66.3 5.5-2.1.68-1.94-.03-3.06-1.44-3.79.1-.24.18-.49.23-.78zm-2.85 5.51c-.48 1.94-3.75.89-4.81.63l.86-3.44c1.06.27 4.45.79 3.95 2.81zm.49-5.54c-.44 1.77-3.16.87-4.04.65l.78-3.12c.88.22 3.7.63 3.26 2.47z" fill="#FFFFFF"/>
+        </svg>
+        <span class="category-label">BTC</span>
+      </div>
+      <div class="address-card" onclick="copyAddress(this, 'bc1q7wk3hss499qmgpa53j4782ru6dczryz35g82wk')">
+        <span class="toast">コピーしました</span>
+        bc1q7wk3hss499qmgpa53j4782ru6dczryz35g82wk
+      </div>
+    </section>
+
+    <!-- イーサリアム -->
+    <section class="category">
+      <div class="category-header">
+        <!-- ETH SVG Logo -->
+        <svg class="crypto-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="16" fill="#627EEA"/>
+          <path d="M16 4v8.87l7.5 3.35L16 4z" fill="#FFFFFF" fill-opacity="0.6"/>
+          <path d="M16 4L8.5 16.22l7.5-3.35V4z" fill="#FFFFFF"/>
+          <path d="M16 21.33v6.66l7.51-10.43L16 21.33z" fill="#FFFFFF" fill-opacity="0.6"/>
+          <path d="M16 28v-6.67l-7.5-3.76L16 28z" fill="#FFFFFF"/>
+          <path d="M16 19.98l7.5-4.42L16 12.22v7.76z" fill="#FFFFFF" fill-opacity="0.2"/>
+          <path d="M8.5 15.56l7.5 4.42v-7.76l-7.5 3.34z" fill="#FFFFFF" fill-opacity="0.6"/>
+        </svg>
+        <span class="category-label">イーサリアム</span>
+      </div>
+      <div class="address-card" onclick="copyAddress(this, '0xa02c98E346605a325B9F90F0401954E8736ffffB')">
+        <span class="toast">コピーしました</span>
+        0xa02c98E346605a325B9F90F0401954E8736ffffB
+      </div>
+    </section>
+
+    <!-- ソラナ -->
+    <section class="category">
+      <div class="category-header">
+        <!-- Solana SVG Logo -->
+        <svg class="crypto-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="16" fill="#000000"/>
+          <path d="M9.8 21.12a.45.45 0 0 1 .32-.13h12.5a.23.23 0 0 1 .16.39l-2.06 2.06a.45.45 0 0 1-.32.13H7.9a.23.23 0 0 1-.16-.39l2.06-2.06z" fill="url(#sol-a)"/>
+          <path d="M9.8 8.43a.45.45 0 0 1 .32-.13h12.5a.23.23 0 0 1 .16.39l-2.06 2.06a.45.45 0 0 1-.32.13H7.9a.23.23 0 0 1-.16-.39L9.8 8.43z" fill="url(#sol-b)"/>
+          <path d="M22.2 14.77a.45.45 0 0 1-.32.13H9.38a.23.23 0 0 1-.16-.39l2.06-2.06a.45.45 0 0 1 .32-.13h12.5a.23.23 0 0 1 .16.39l-2.06 2.06z" fill="url(#sol-c)"/>
+          <defs>
+            <linearGradient id="sol-a" x1="7.67" y1="22.23" x2="22.78" y2="22.23" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/>
+            </linearGradient>
+            <linearGradient id="sol-b" x1="7.67" y1="9.54" x2="22.78" y2="9.54" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/>
+            </linearGradient>
+            <linearGradient id="sol-c" x1="9.22" y1="13.58" x2="24.33" y2="13.58" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="category-label">ソラナ</span>
+      </div>
+      <div class="address-card" onclick="copyAddress(this, 'BasajvTUfK4rPQ2yvn7GG1BugHyZqeQSQzZNdtndsLLs')">
+        <span class="toast">コピーしました</span>
+        BasajvTUfK4rPQ2yvn7GG1BugHyZqeQSQzZNdtndsLLs
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const elDays  = document.getElementById('cd-days');
+    const elHours = document.getElementById('cd-hours');
+    const elMins  = document.getElementById('cd-mins');
+    const elSecs  = document.getElementById('cd-secs');
+
+    function pad(n) {
+      return String(n).padStart(2, '0');
+    }
+
+    function tick() {
+      const now = new Date();
+      let year = now.getFullYear();
+      let target = new Date(year, 11, 15, 0, 0, 0);        // 12/15 00:00
+      const endOfDay = new Date(year, 11, 15, 23, 59, 59, 999);
+
+      // 12/15 当日 → 虹色モード
+      const isRainbowDay = now >= target && now <= endOfDay;
+      document.body.classList.toggle('rainbow-day', isRainbowDay);
+
+      // 12/15 を過ぎていたら来年の 12/15 へ
+      if (now > endOfDay) {
+        target = new Date(year + 1, 11, 15, 0, 0, 0);
+      }
+
+      const diff = Math.max(0, target - now);
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor(diff / 3600000) % 24;
+      const m = Math.floor(diff / 60000) % 60;
+      const s = Math.floor(diff / 1000) % 60;
+
+      elDays.textContent  = pad(d);
+      elHours.textContent = pad(h);
+      elMins.textContent  = pad(m);
+      elSecs.textContent  = pad(s);
+    }
+
+    tick();
+    setInterval(tick, 1000);
+
+    // ワンクリックで自動コピー機能
+    function copyAddress(cardElement, text) {
+      const showToast = () => {
+        const toast = cardElement.querySelector('.toast');
+        if (toast) {
+          toast.classList.add('show');
+          setTimeout(() => {
+            toast.classList.remove('show');
+          }, 1800);
+        }
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(showToast).catch(err => {
+          fallbackCopy(text, showToast);
+        });
+      } else {
+        fallbackCopy(text, showToast);
+      }
+    }
+
+    // クリップボードAPI非対応環境用のフォールバック処理
+    function fallbackCopy(text, callback) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        callback();
+      } catch (err) {
+        console.error('コピーに失敗しました:', err);
+      }
+      document.body.removeChild(textArea);
+    }
+  </script>
+</body>
+</html>
