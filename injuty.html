@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>ケガ</title>
+<style>
+:root{
+  --lv0:#8bc34a;   /* 黄緑（正常） */
+  --lv1:#f2b705;   /* 黄（軽傷） */
+  --lv2:#f57c00;   /* 橙（中傷） */
+  --lv3:#e53935;   /* 赤（重症） */
+  --text:#2c3a42;
+  --muted:#8fa1ab;
+  --line:#e3ebf0;
+  --card:#ffffff;
+  --bg:#f4f8fa;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;}
+body{
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"SFMono-Regular",Menlo,Consolas,"Yu Gothic UI","Yu Gothic",monospace;
+  display:flex;justify-content:center;
+  padding:28px 16px 60px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{width:100%;max-width:880px;}
+
+header{text-align:center;margin-bottom:24px;}
+h1{
+  margin:0;
+  font-size:clamp(20px,4vw,28px);
+  letter-spacing:.2em;
+  color:#2c3a42;
+  font-weight:600;
+}
+.sub{margin:8px 0 0;font-size:11px;letter-spacing:.3em;color:#9db0ba;}
+
+.board{
+  display:grid;
+  grid-template-columns:minmax(230px,300px) 1fr;
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:640px){
+  .board{grid-template-columns:1fr;}
+}
+
+/* ---------- ピクトグラム ---------- */
+.figure{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:18px;
+}
+.pictogram{
+  width:100%;
+  max-width:270px;
+  height:auto;
+  display:block;
+  margin:0 auto;
+}
+[data-part]{
+  transition:color .35s ease;
+}
+[data-part].lv1{filter:drop-shadow(0 0 4px var(--lv1));}
+[data-part].lv2{filter:drop-shadow(0 0 6px var(--lv2));}
+[data-part].lv3{
+  filter:drop-shadow(0 0 9px var(--lv3));
+  animation:blink .9s steps(1,end) infinite;
+}
+@keyframes blink{
+  0%,100%{opacity:1;}
+  50%{opacity:.28;}
+}
+
+.legend{
+  list-style:none;
+  display:flex;flex-wrap:wrap;gap:8px 16px;
+  justify-content:center;
+  padding:0;margin:18px 0 0;
+  font-size:11px;color:var(--muted);
+}
+.legend li{display:flex;align-items:center;gap:6px;}
+.legend i{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--c);
+  box-shadow:0 0 6px var(--c);
+}
+
+/* ---------- パネル ---------- */
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+}
+.panel-head{
+  display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  font-size:11px;letter-spacing:.2em;color:var(--muted);
+  padding-bottom:10px;margin-bottom:12px;
+  border-bottom:1px dashed var(--line);
+}
+
+/* アクティブ負傷 */
+.alert{
+  border:1px solid var(--line);
+  border-left:3px solid var(--c);
+  border-radius:9px;
+  padding:12px 14px;
+  margin-bottom:10px;
+  background:#fff;
+}
+.alert-head{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  font-size:12px;
+}
+.alert-head strong{color:#22313a;font-size:13px;letter-spacing:.12em;}
+.alert-heal{
+  margin-left:auto;
+  font-size:11px;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.blink{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--c);
+  box-shadow:0 0 8px var(--c);
+  animation:blink 1s infinite;
+}
+.alert-comment{
+  margin:8px 0 0;
+  font-size:12px;line-height:1.7;color:#4a5c66;
+}
+
+/* 部位リスト */
+.parts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;}
+.part{
+  display:grid;
+  grid-template-columns:10px 58px 54px 1fr;
+  gap:10px 12px;
+  align-items:center;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#fff;
+  font-size:12px;
+}
+.part.is-normal{opacity:.75;}
+.dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--c);
+  box-shadow:0 0 6px var(--c);
+}
+.pname{letter-spacing:.08em;color:#2c3a42;}
+.badge{
+  display:inline-block;
+  font-size:10px;line-height:1;
+  padding:4px 7px;
+  border-radius:999px;
+  border:1px solid var(--c);
+  color:var(--c);
+  white-space:nowrap;
+  text-align:center;
+}
+.heal{display:flex;align-items:center;gap:8px;min-width:0;}
+.heal-bar{
+  flex:1;height:6px;border-radius:3px;background:#eef2f5;overflow:hidden;
+}
+.heal-bar i{
+  display:block;height:100%;border-radius:3px;
+  background:var(--c);
+}
+.heal-val{
+  font-size:11px;color:var(--muted);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.heal-none{color:#c3ced6;font-size:11px;}
+.part .cmt{
+  grid-column:2 / -1;
+  margin:0;
+  font-size:11.5px;
+  line-height:1.6;
+  color:#5d707a;
+}
+
+@media (max-width:520px){
+  .part{grid-template-columns:10px 52px 50px 1fr;gap:8px;}
+}
+
+footer{
+  margin-top:22px;text-align:center;
+  font-size:10px;letter-spacing:.12em;color:#b3c2cb;
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>ケガなう</h1>
+    <p class="sub">怪我してる場所</p>
+  </header>
+
+  <div class="board">
+
+    <!-- ===== 人体ピクトグラム ===== -->
+    <section class="figure">
+      <svg class="pictogram" viewBox="0 0 200 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="人体ピクトグラム">
+        <!-- 脚 -->
+        <g data-part="右足" fill="none" stroke="currentColor" stroke-width="19" stroke-linecap="round">
+          <path d="M115,218 L119,300"/>
+          <path d="M119,300 L119,370"/>
+          <ellipse cx="121" cy="382" rx="15" ry="9" fill="currentColor" stroke="none"/>
+        </g>
+        <g data-part="左足" fill="none" stroke="currentColor" stroke-width="19" stroke-linecap="round">
+          <path d="M85,218 L81,300"/>
+          <path d="M81,300 L81,370"/>
+          <ellipse cx="79" cy="382" rx="15" ry="9" fill="currentColor" stroke="none"/>
+        </g>
+
+        <!-- 腕 -->
+        <g data-part="左腕" fill="none" stroke="currentColor" stroke-width="17" stroke-linecap="round">
+          <path d="M80,92 L58,152"/>
+          <path d="M58,152 L48,202"/>
+        </g>
+        <g data-part="右上" fill="none" stroke="currentColor" stroke-width="17" stroke-linecap="round">
+          <path d="M120,92 L142,152"/>
+          <path d="M142,152 L152,202"/>
+        </g>
+
+        <!-- 手 -->
+        <g data-part="左手">
+          <ellipse cx="44" cy="219" rx="12" ry="17" fill="currentColor"/>
+        </g>
+        <g data-part="右手">
+          <ellipse cx="156" cy="219" rx="12" ry="17" fill="currentColor"/>
+        </g>
+
+        <!-- 腹部 -->
+        <g data-part="腹部">
+          <path d="M67,155 L133,155 L127,220 L73,220 Z" fill="currentColor"/>
+        </g>
+
+        <!-- 固定パーツ（胸・首） -->
+        <path d="M73,82 L127,82 L133,155 L67,155 Z" fill="#dde5ea"/>
+        <rect x="91" y="64" width="18" height="20" rx="5" fill="#dde5ea"/>
+
+        <!-- 頭部 -->
+        <g data-part="頭部">
+          <circle cx="100" cy="44" r="27" fill="currentColor"/>
+        </g>
+      </svg>
+
+      <ul class="legend">
+        <li><i style="--c:var(--lv0)"></i>0 正常</li>
+        <li><i style="--c:var(--lv1)"></i>1 軽傷</li>
+        <li><i style="--c:var(--lv2)"></i>2 中傷</li>
+        <li><i style="--c:var(--lv3)"></i>3 重症</li>
+      </ul>
+    </section>
+
+    <!-- ===== ステータスパネル ===== -->
+    <section class="panel">
+      <div class="panel-head">
+        <span>PARTS STATUS</span>
+        <span>REPAIR INDEX</span>
+      </div>
+
+      <div id="alertBox" hidden></div>
+
+      <ul class="parts" id="partList"></ul>
+    </section>
+
+  </div>
+
+  <footer>※ 表示内容は負傷データ（JSON）に基づく演出です。</footer>
+</div>
+
+
+<!-- ============================================================
+     編集データ
+     level  : 0=正常 / 1=軽傷 / 2=中傷 / 3=重症
+     period : 完治予定日時（この時刻に近づくほど完治度が100%へ）
+     comment: 期限内 かつ level 1以上のときだけ表示
+     ============================================================ -->
+<script id="injury-data" type="application/json">
+{
+  "parts": {
+    "頭部": { "level": 0, "period": null, "comment": "" },
+    "左腕": { "level": 0, "period": null, "comment": "" },
+    "左手": { "level": 0, "period": null, "comment": "" },
+    "右上": { "level": 0, "period": null, "comment": "" },
+    "右手": { "level": 0, "period": null, "comment": "" },
+    "腹部": { "level": 0, "period": null, "comment": "" },
+    "右足": { "level": 0, "period": null, "comment": "" },
+    "左足": {
+      "level": 1,
+      "period": "2026-10-01T23:59",
+      "comment": "妹が割ったガラスを踏んで切り傷"
+    }
+  }
+}
+</script>
+
+<!-- common.js のロードを試みる（無くても動作継続） -->
+<script>
+(function () {
+  var s = document.createElement("script");
+  s.src = "common.js";
+  s.async = false;
+  s.onerror = function () { /* common.js が無い場合は無視 */ };
+  document.head.appendChild(s);
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  var DATA = JSON.parse(document.getElementById("injury-data").textContent);
+
+  var COLORS = { 0: "var(--lv0)", 1: "var(--lv1)", 2: "var(--lv2)", 3: "var(--lv3)" };
+  var LABELS = { 0: "正常", 1: "軽傷", 2: "中傷", 3: "重症" };
+
+  var partNames = Object.keys(DATA.parts || {});
+
+  /* ---------- utils ---------- */
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function endDate(part) {
+    if (!part || !part.period) return null;
+    var d = new Date(part.period);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function isActive(part) {
+    var e = endDate(part);
+    return e === null ? true : Date.now() <= e.getTime();
+  }
+
+  function effLevel(part) {
+    if (!part) return 0;
+    var lv = Number(part.level) || 0;
+    lv = Math.max(0, Math.min(3, lv));
+    if (lv <= 0) return 0;
+    return isActive(part) ? lv : 0;
+  }
+
+  /* ---------- 完治度 ----------
+     残り時間ベースの指数。
+       残り 0h   → 100%
+       残り 24h  → 50%
+       残り 72h  → 25%
+       残り 168h → 12.5%
+     式: 100 × 24 / (24 + 残り時間[h])
+     期限内は最大 99.9% に丸める。
+  --------------------------------- */
+  function recovery(part) {
+    var e = endDate(part);
+    if (!e) return null;                     // 期限なし＝算出不可
+    var remain = e.getTime() - Date.now();
+    if (remain <= 0) return 100;             // 期限到達
+    var h = remain / 3600000;
+    return Math.min(99.9, (100 * 24) / (24 + h));
+  }
+
+  /* ---------- render ---------- */
+
+  function render() {
+
+    /* 1. ピクトグラム */
+    document.querySelectorAll("[data-part]").forEach(function (g) {
+      var part = DATA.parts[g.dataset.part];
+      var lv = effLevel(part);
+      g.style.color = COLORS[lv];
+      g.classList.toggle("lv1", lv === 1);
+      g.classList.toggle("lv2", lv === 2);
+      g.classList.toggle("lv3", lv === 3);
+    });
+
+    /* 2. 部位リスト */
+    var list = document.getElementById("partList");
+    list.innerHTML = partNames.map(function (name) {
+      var part = DATA.parts[name] || {};
+      var raw = Number(part.level) || 0;
+      var lv = effLevel(part);
+      var expired = raw > 0 && !isActive(part);
+
+      /* 完治度セル */
+      var healHtml;
+      if (raw <= 0) {
+        healHtml = '<span class="heal"><span class="heal-none">—</span></span>';
+      } else if (expired) {
+        healHtml =
+          '<span class="heal">' +
+            '<span class="heal-bar"><i style="width:100%"></i></span>' +
+            '<span class="heal-val">100%</span>' +
+          '</span>';
+      } else {
+        var r = recovery(part);
+        if (r === null) {
+          healHtml = '<span class="heal"><span class="heal-none">—</span></span>';
+        } else {
+          healHtml =
+            '<span class="heal">' +
+              '<span class="heal-bar"><i style="width:' + r.toFixed(1) + '%"></i></span>' +
+              '<span class="heal-val">' + r.toFixed(1) + '%</span>' +
+            '</span>';
+        }
+      }
+
+      /* コメント（期限内かつ level 1以上のみ） */
+      var comment = (lv >= 1 && part.comment) ? escapeHtml(part.comment) : "";
+      var cmtHtml = comment ? '<p class="cmt">' + comment + "</p>" : "";
+
+      return '' +
+        '<li class="part' + (lv === 0 ? " is-normal" : "") + '" style="--c:' + COLORS[lv] + '">' +
+          '<span class="dot"></span>' +
+          '<span class="pname">' + escapeHtml(name) + "</span>" +
+          '<span class="badge">' + LABELS[lv] + "</span>" +
+          healHtml +
+          cmtHtml +
+        "</li>";
+    }).join("");
+
+    /* 3. アクティブ負傷のハイライト */
+    var actives = partNames.filter(function (name) {
+      var p = DATA.parts[name] || {};
+      return effLevel(p) >= 1 && p.comment;
+    });
+
+    var box = document.getElementById("alertBox");
+    if (actives.length) {
+      box.hidden = false;
+      box.innerHTML = actives.map(function (name) {
+        var p = DATA.parts[name];
+        var lv = effLevel(p);
+        var r = recovery(p);
+        var rTxt = (r === null)
+          ? ""
+          : '<span class="alert-heal">完治度 ' + r.toFixed(1) + "%</span>";
+
+        return '' +
+          '<div class="alert" style="--c:' + COLORS[lv] + '">' +
+            '<div class="alert-head">' +
+              '<span class="blink"></span>' +
+              "<strong>" + escapeHtml(name) + "</strong>" +
+              '<span class="badge">' + LABELS[lv] + "</span>" +
+              rTxt +
+            "</div>" +
+            '<p class="alert-comment">' + escapeHtml(p.comment) + "</p>" +
+          "</div>";
+      }).join("");
+    } else {
+      box.hidden = true;
+      box.innerHTML = "";
+    }
+  }
+
+  render();
+  /* 完治度を動的に更新（1秒ごと） */
+  setInterval(render, 1000);
+})();
+</script>
+
+</body>
+</html>
