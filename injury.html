@@ -269,8 +269,8 @@ footer{
     <!-- ===== ステータスパネル ===== -->
     <section class="panel">
       <div class="panel-head">
-        <span>PARTS STATUS</span>
-        <span>REPAIR INDEX</span>
+        <span>損傷部位</span>
+        <span>治癒進行</span>
       </div>
 
       <div id="alertBox" hidden></div>
@@ -317,7 +317,7 @@ footer{
   var DATA = JSON.parse(document.getElementById("injury-data").textContent);
 
   var COLORS = { 0: "var(--lv0)", 1: "var(--lv1)", 2: "var(--lv2)", 3: "var(--lv3)" };
-  var LABELS = { 0: "正常", 1: "軽傷", 2: "中傷", 3: "重症" };
+  var LABELS = { 0: "正常", 1: "軽症", 2: "中等症", 3: "重症" };
 
   var partNames = Object.keys(DATA.parts || {});
 
