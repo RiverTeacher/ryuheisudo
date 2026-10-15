@@ -186,6 +186,8 @@
     align-items: center;
     justify-content: center;
     perspective: 1400px;
+    touch-action: pan-y;
+    user-select: none;
   }
 
   .ring {
@@ -193,16 +195,7 @@
     width: 300px;
     height: 200px;
     transform-style: preserve-3d;
-    animation: spinRing 16s linear infinite;
-  }
-
-  .ring:hover {
-    animation-play-state: paused;
-  }
-
-  @keyframes spinRing {
-    from { transform: rotateY(0deg); }
-    to   { transform: rotateY(360deg); }
+    will-change: transform;
   }
 
   .panel {
@@ -376,8 +369,7 @@
     body,
     body::before,
     body::after,
-    .cd-colon,
-    .ring {
+    .cd-colon {
       animation: none;
     }
   }
@@ -429,7 +421,7 @@
 
   <main class="stage">
     <h1>Home</h1>
-    <div class="ring">
+    <div class="ring" id="ring">
       <a href="contact.html" class="panel">
         <span class="bracket bracket-tl"></span>
         <span class="bracket bracket-tr"></span>
@@ -455,10 +447,11 @@
         <span class="panel-title">ケガ</span>
       </a>
     </div>
-    <span class="hint">マウスを乗せると停止 / クリックで移動</span>
+    <span class="hint">くるくるできます</span>
   </main>
 
   <script>
+    // Countdown
     const elDays  = document.getElementById('cd-days');
     const elHours = document.getElementById('cd-hours');
     const elMins  = document.getElementById('cd-mins');
@@ -495,6 +488,84 @@
 
     tick();
     setInterval(tick, 1000);
+
+    // 3D Ring interaction
+    const ring = document.getElementById('ring');
+    const panels = document.querySelectorAll('.panel');
+
+    let rotation = 0;
+    let velocity = 0.25;
+    let isTouching = false;
+    let isHovering = false;
+    let lastTouchX = 0;
+    let lastTouchTime = 0;
+    let touchMoved = false;
+
+    function animate() {
+      if (!isTouching) {
+        if (isHovering) {
+          velocity *= 0.88;
+          if (Math.abs(velocity) < 0.015) velocity = 0;
+        } else {
+          velocity += (0.25 - velocity) * 0.025;
+        }
+      }
+
+      rotation += velocity;
+      ring.style.transform = 'rotateY(' + rotation + 'deg)';
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+
+    // Touch swipe to spin
+    ring.addEventListener('touchstart', function(e) {
+      isTouching = true;
+      lastTouchX = e.touches[0].clientX;
+      lastTouchTime = Date.now();
+      touchMoved = false;
+    }, { passive: true });
+
+    ring.addEventListener('touchmove', function(e) {
+      if (!isTouching) return;
+      const x = e.touches[0].clientX;
+      const now = Date.now();
+      const dt = now - lastTouchTime;
+      const dx = x - lastTouchX;
+
+      if (dt > 0) {
+        velocity = (dx / dt) * 6;
+      }
+
+      rotation += dx * 0.35;
+      ring.style.transform = 'rotateY(' + rotation + 'deg)';
+
+      lastTouchX = x;
+      lastTouchTime = now;
+      touchMoved = true;
+    }, { passive: true });
+
+    ring.addEventListener('touchend', function() {
+      isTouching = false;
+    });
+
+    // Prevent link click on swipe
+    panels.forEach(function(panel) {
+      panel.addEventListener('click', function(e) {
+        if (touchMoved) {
+          e.preventDefault();
+        }
+      });
+    });
+
+    // Mouse hover pause
+    ring.addEventListener('mouseenter', function() {
+      isHovering = true;
+    });
+
+    ring.addEventListener('mouseleave', function() {
+      isHovering = false;
+    });
   </script>
 </body>
 </html>
