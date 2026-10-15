@@ -3,20 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- キャッシュ禁止 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-
-<!-- 検索キーワード -->
 <meta name="keywords" content="須藤龍平, 須藤 龍平">
 <meta name="author" content="須藤龍平">
-
- <meta name="google-site-verification" content="u26voLDqtXNVUxhyeHSJq0uz7MsFmRnied1q09tnBaA" />
+<meta name="google-site-verification" content="u26voLDqtXNVUxhyeHSJq0uz7MsFmRnied1q09tnBaA" />
 <title>須藤龍平</title>
- <script src="common.js"></script>
-<link rel="canonical" href="https://riverteacher.github.io/ryuheisudo/"> 
+<script src="common.js"></script>
+<link rel="canonical" href="https://riverteacher.github.io/ryuheisudo/">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-jp@latest/japanese-400-normal.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-jp@latest/japanese-300-normal.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/share-tech-mono@latest/latin-400-normal.css">
@@ -39,11 +34,8 @@
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    padding: 40px 20px;
     overflow-x: hidden;
     position: relative;
-
-    /* ゆっくり流れるグラデーション背景 */
     background: linear-gradient(
       120deg,
       #ffffff 0%,
@@ -63,7 +55,6 @@
     100% { background-position: 0% 50%; }
   }
 
-  /* ===== 12/15 限定: 虹色背景 ===== */
   body.rainbow-day {
     background: linear-gradient(
       120deg,
@@ -84,7 +75,6 @@
     100% { background-position: 0% 50%; }
   }
 
-  /* ふわふわ漂う水色の光 */
   body::before,
   body::after {
     content: '';
@@ -123,7 +113,6 @@
     50%      { transform: translate(-6vmax, -4vmax) scale(1.1); }
   }
 
-  /* 12/15は光の色相が回転して虹っぽく */
   @keyframes hueSpin {
     from { filter: blur(80px) hue-rotate(0deg); }
     to   { filter: blur(80px) hue-rotate(360deg); }
@@ -137,7 +126,6 @@
     animation: floatB 20s ease-in-out infinite, hueSpin 9s linear infinite;
   }
 
-  /* ===== 背景のカウントダウン ===== */
   .countdown {
     position: fixed;
     inset: 0;
@@ -187,143 +175,236 @@
     color: #8a6bb0;
   }
 
-  .container {
+  /* 3D Ring Stage */
+  .stage {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 420px;
-    padding: 60px 40px;
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(173, 216, 240, 0.3);
-    border-radius: 24px;
-    box-shadow:
-      0 8px 32px rgba(135, 206, 235, 0.12),
-      0 2px 8px rgba(173, 216, 240, 0.08);
-    animation: fadeIn 1s ease-out;
+    max-width: 1000px;
+    height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1400px;
   }
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  h1 {
-    font-size: 14px;
-    font-weight: 300;
-    letter-spacing: 0.3em;
-    color: rgba(100, 160, 200, 0.8);
-    text-align: center;
-    margin-bottom: 56px;
-    text-transform: uppercase;
-  }
-
-  .category {
-    margin-bottom: 40px;
-  }
-
-  .category:last-child {
-    margin-bottom: 0;
-  }
-
-  .category-label {
-    display: block;
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.25em;
-    color: rgba(100, 160, 200, 0.7);
-    margin-bottom: 18px;
-    padding-left: 4px;
-    text-transform: uppercase;
-  }
-
-  .nav-link {
-    display: block;
+  .ring {
     position: relative;
-    padding: 14px 4px;
-    font-size: 18px;
-    font-weight: 300;
-    color: #4a5a6c;
-    text-decoration: none;
-    letter-spacing: 0.05em;
-    transition: color 0.4s ease;
-    cursor: pointer;
+    width: 300px;
+    height: 200px;
+    transform-style: preserve-3d;
+    animation: spinRing 16s linear infinite;
   }
 
-  .nav-link::after {
+  .ring:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes spinRing {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(360deg); }
+  }
+
+  .panel {
+    position: absolute;
+    width: 300px;
+    height: 200px;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(0, 200, 255, 0.35);
+    border-radius: 16px;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+      0 8px 32px rgba(0, 160, 220, 0.12),
+      0 0 24px rgba(0, 200, 255, 0.08);
+    text-decoration: none;
+    color: #2a5a70;
+    transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  /* 走る光 */
+  .panel::before {
     content: '';
     position: absolute;
-    left: 4px;
-    right: 4px;
-    bottom: 6px;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 220, 255, 0.12),
+      transparent
+    );
+    transform: skewX(-20deg);
+    transition: left 0.8s ease;
+    pointer-events: none;
+  }
+
+  .panel:hover::before {
+    left: 150%;
+  }
+
+  .panel:hover {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(0, 200, 255, 0.75);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.7) inset,
+      0 14px 48px rgba(0, 160, 220, 0.22),
+      0 0 36px rgba(0, 220, 255, 0.18);
+    color: #1a4a60;
+  }
+
+  .panel-category {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.35em;
+    color: rgba(0, 160, 200, 0.75);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    transition: color 0.4s ease, text-shadow 0.4s ease;
+  }
+
+  .panel:hover .panel-category {
+    color: rgba(0, 180, 220, 1);
+    text-shadow: 0 0 12px rgba(0, 200, 255, 0.45);
+  }
+
+  .panel-title {
+    font-size: 24px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    color: #3a5a6c;
+    transition: color 0.4s ease, text-shadow 0.4s ease;
+  }
+
+  .panel:hover .panel-title {
+    color: #0d3a4e;
+    text-shadow: 0 0 18px rgba(0, 200, 255, 0.35), 0 0 36px rgba(0, 180, 230, 0.12);
+  }
+
+  /* パネル下部のネオンライン */
+  .panel::after {
+    content: '';
+    position: absolute;
+    left: 28px;
+    right: 28px;
+    bottom: 32px;
     height: 1.5px;
     background: linear-gradient(
       90deg,
-      rgba(135, 206, 235, 0.1) 0%,
-      rgba(135, 206, 235, 0.55) 40%,
-      rgba(173, 216, 240, 0.7) 70%,
-      rgba(200, 235, 250, 0.4) 100%
+      transparent 0%,
+      rgba(0, 200, 255, 0.55) 40%,
+      rgba(0, 180, 230, 0.75) 70%,
+      transparent 100%
     );
     border-radius: 2px;
     transform: scaleX(0);
     transform-origin: left center;
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 0 8px rgba(0, 200, 255, 0.35);
   }
 
-  .nav-link:hover {
-    color: #2c4a5c;
-  }
-
-  .nav-link:hover::after,
-  .nav-link:focus::after {
+  .panel:hover::after {
     transform: scaleX(1);
   }
 
-  .nav-link:active::after {
-    transform: scaleX(1);
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      rgba(100, 180, 220, 0.3) 0%,
-      rgba(100, 180, 220, 0.75) 50%,
-      rgba(135, 206, 235, 0.5) 100%
-    );
+  /* コーナーブラケット */
+  .panel .bracket {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid rgba(0, 200, 255, 0.3);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+    pointer-events: none;
   }
 
-  .nav-link.pressed::after {
-    transform: scaleX(1);
+  .panel .bracket-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+  .panel .bracket-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+  .panel .bracket-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+  .panel .bracket-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+  .panel:hover .bracket {
+    border-color: rgba(0, 200, 255, 0.7);
+    box-shadow: 0 0 6px rgba(0, 200, 255, 0.25);
   }
 
-  /* アニメーションを控えたい環境向けの配慮 */
+  /* 3 panels on ring */
+  .panel:nth-child(1) { transform: rotateY(0deg) translateZ(380px); }
+  .panel:nth-child(2) { transform: rotateY(120deg) translateZ(380px); }
+  .panel:nth-child(3) { transform: rotateY(240deg) translateZ(380px); }
+
+  h1 {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.4em;
+    color: rgba(80, 150, 190, 0.85);
+    text-transform: uppercase;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .hint {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: rgba(80, 160, 200, 0.55);
+    pointer-events: none;
+    z-index: 3;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     body,
     body::before,
     body::after,
-    .container,
-    .cd-colon {
+    .cd-colon,
+    .ring {
       animation: none;
     }
   }
 
-  @media (max-width: 480px) {
-    .container {
-      padding: 48px 28px;
+  @media (max-width: 640px) {
+    .stage {
+      height: 400px;
+      perspective: 900px;
     }
-    .nav-link {
-      font-size: 16px;
+    .ring {
+      width: 210px;
+      height: 140px;
     }
+    .panel {
+      width: 210px;
+      height: 140px;
+    }
+    .panel-title {
+      font-size: 18px;
+    }
+    .panel:nth-child(1) { transform: rotateY(0deg) translateZ(240px); }
+    .panel:nth-child(2) { transform: rotateY(120deg) translateZ(240px); }
+    .panel:nth-child(3) { transform: rotateY(240deg) translateZ(240px); }
   }
 </style>
 </head>
 <body>
-  <!-- 背景のカウントダウン（12/15まで） -->
   <div class="countdown" aria-hidden="true">
     <div class="cd-segment">
       <span class="cd-num" id="cd-days">--</span>
@@ -346,19 +427,35 @@
     </div>
   </div>
 
-  <main class="container">
+  <main class="stage">
     <h1>Home</h1>
-
-    <section class="category">
-      <span class="category-label">一般</span>
-      <a href="contact.html" class="nav-link">連絡先</a>
-      <a href="wallet.html" class="nav-link">ウォレットアドレス</a>
-    </section>
-
-    <section class="category">
-      <span class="category-label">ネタ</span>
-      <a href="injury.html" class="nav-link">ケガ</a>
-    </section>
+    <div class="ring">
+      <a href="contact.html" class="panel">
+        <span class="bracket bracket-tl"></span>
+        <span class="bracket bracket-tr"></span>
+        <span class="bracket bracket-bl"></span>
+        <span class="bracket bracket-br"></span>
+        <span class="panel-category">一般</span>
+        <span class="panel-title">連絡先</span>
+      </a>
+      <a href="wallet.html" class="panel">
+        <span class="bracket bracket-tl"></span>
+        <span class="bracket bracket-tr"></span>
+        <span class="bracket bracket-bl"></span>
+        <span class="bracket bracket-br"></span>
+        <span class="panel-category">一般</span>
+        <span class="panel-title">ウォレットアドレス</span>
+      </a>
+      <a href="injury.html" class="panel">
+        <span class="bracket bracket-tl"></span>
+        <span class="bracket bracket-tr"></span>
+        <span class="bracket bracket-bl"></span>
+        <span class="bracket bracket-br"></span>
+        <span class="panel-category">ネタ</span>
+        <span class="panel-title">ケガ</span>
+      </a>
+    </div>
+    <span class="hint">マウスを乗せると停止 / クリックで移動</span>
   </main>
 
   <script>
@@ -374,14 +471,12 @@
     function tick() {
       const now = new Date();
       let year = now.getFullYear();
-      let target = new Date(year, 11, 15, 0, 0, 0);        // 12/15 00:00
+      let target = new Date(year, 11, 15, 0, 0, 0);
       const endOfDay = new Date(year, 11, 15, 23, 59, 59, 999);
 
-      // 12/15 当日 → 虹色モード
       const isRainbowDay = now >= target && now <= endOfDay;
       document.body.classList.toggle('rainbow-day', isRainbowDay);
 
-      // 12/15 を過ぎていたら来年の 12/15 へ
       if (now > endOfDay) {
         target = new Date(year + 1, 11, 15, 0, 0, 0);
       }
@@ -400,13 +495,6 @@
 
     tick();
     setInterval(tick, 1000);
-
-    // タッチデバイスでも線が残りやすいよう、クリック時に一時的にクラスを付与
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.addEventListener('click', function() {
-        this.classList.add('pressed');
-      });
-    });
   </script>
 </body>
 </html>
