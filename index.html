@@ -185,7 +185,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    perspective: 1400px;
+    perspective: 1400px; /* JSが枚数に応じて上書きします */
     touch-action: pan-y;
     user-select: none;
   }
@@ -220,9 +220,13 @@
       0 0 24px rgba(0, 200, 255, 0.08);
     text-decoration: none;
     color: #2a5a70;
-    transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: background 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                color 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     cursor: pointer;
     overflow: hidden;
+    /* transform（配置）はJSが設定します */
   }
 
   /* 走る光 */
@@ -279,6 +283,7 @@
     font-weight: 300;
     letter-spacing: 0.08em;
     color: #3a5a6c;
+    padding: 0 12px;
     transition: color 0.4s ease, text-shadow 0.4s ease;
   }
 
@@ -333,11 +338,6 @@
     box-shadow: 0 0 6px rgba(0, 200, 255, 0.25);
   }
 
-  /* 3 panels on ring */
-  .panel:nth-child(1) { transform: rotateY(0deg) translateZ(380px); }
-  .panel:nth-child(2) { transform: rotateY(120deg) translateZ(380px); }
-  .panel:nth-child(3) { transform: rotateY(240deg) translateZ(380px); }
-
   h1 {
     position: absolute;
     top: 20px;
@@ -377,7 +377,6 @@
   @media (max-width: 640px) {
     .stage {
       height: 400px;
-      perspective: 900px;
     }
     .ring {
       width: 210px;
@@ -390,9 +389,6 @@
     .panel-title {
       font-size: 18px;
     }
-    .panel:nth-child(1) { transform: rotateY(0deg) translateZ(240px); }
-    .panel:nth-child(2) { transform: rotateY(120deg) translateZ(240px); }
-    .panel:nth-child(3) { transform: rotateY(240deg) translateZ(240px); }
   }
 </style>
 </head>
@@ -419,8 +415,9 @@
     </div>
   </div>
 
-  <main class="stage">
+  <main class="stage" id="stage">
     <h1>Home</h1>
+    <!-- パネルを増やしたいときは、下に <a class="panel"> をコピーして追加するだけでOK -->
     <div class="ring" id="ring">
       <a href="contact.html" class="panel">
         <span class="bracket bracket-tl"></span>
@@ -438,7 +435,6 @@
         <span class="panel-category">一般</span>
         <span class="panel-title">ウォレットアドレス</span>
       </a>
-     
       <a href="announce.html" class="panel">
         <span class="bracket bracket-tl"></span>
         <span class="bracket bracket-tr"></span>
@@ -498,9 +494,10 @@
     tick();
     setInterval(tick, 1000);
 
-    // 3D Ring interaction
+    // 3D Ring
+    const stage = document.getElementById('stage');
     const ring = document.getElementById('ring');
-    const panels = document.querySelectorAll('.panel');
+    const panels = ring.querySelectorAll('.panel');
 
     let rotation = 0;
     let velocity = 0.25;
@@ -509,6 +506,39 @@
     let lastTouchX = 0;
     let lastTouchTime = 0;
     let touchMoved = false;
+    let ringRadius = 380;
+
+    // パネル枚数・画面幅に応じて、角度と半径を自動計算して配置する
+    function layoutRing() {
+      const count = panels.length;
+      if (count === 0) return;
+
+      const panelWidth = panels[0].offsetWidth;
+      const step = 360 / count;
+
+      // 隣同士が重ならない半径（パネル幅の1.3倍ぶんの間隔を確保）
+      const pitch = panelWidth * 1.3;
+      const neededRadius = count > 1 ? (pitch / 2) / Math.tan(Math.PI / count) : 0;
+
+      // 少ない枚数でも元のゆったりした見た目を保つための最小半径
+      const minRadius = panelWidth * 1.25;
+
+      ringRadius = Math.max(minRadius, neededRadius);
+
+      panels.forEach(function(panel, i) {
+        panel.style.transform = 'rotateY(' + (step * i) + 'deg) translateZ(' + ringRadius + 'px)';
+      });
+
+      // 半径に比例して遠近感も調整（枚数が増えても歪みすぎない）
+      stage.style.perspective = Math.max(900, ringRadius * 3.5) + 'px';
+
+      applyRotation();
+    }
+
+    // 手前のパネルが常に等倍になるよう、リング全体を奥へ下げて回転させる
+    function applyRotation() {
+      ring.style.transform = 'translateZ(' + (-ringRadius) + 'px) rotateY(' + rotation + 'deg)';
+    }
 
     function animate() {
       if (!isTouching) {
@@ -521,10 +551,12 @@
       }
 
       rotation += velocity;
-      ring.style.transform = 'rotateY(' + rotation + 'deg)';
+      applyRotation();
       requestAnimationFrame(animate);
     }
 
+    layoutRing();
+    window.addEventListener('resize', layoutRing);
     requestAnimationFrame(animate);
 
     // Touch swipe to spin
@@ -547,7 +579,7 @@
       }
 
       rotation += dx * 0.35;
-      ring.style.transform = 'rotateY(' + rotation + 'deg)';
+      applyRotation();
 
       lastTouchX = x;
       lastTouchTime = now;
