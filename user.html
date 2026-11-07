@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="author" content="須藤龍平">
+<title>ユーザー情報 | 須藤龍平</title>
+<script src="common.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-jp@latest/japanese-400-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-jp@latest/japanese-300-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/share-tech-mono@latest/latin-400-normal.css">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    color: #3a4a5c;
+    min-height: 100vh;
+    padding: 72px 16px 48px;
+    background: linear-gradient(
+      120deg,
+      #ffffff 0%,
+      #eaf6fc 20%,
+      #ffffff 40%,
+      #e3f2fa 60%,
+      #ffffff 80%,
+      #eef8fd 100%
+    );
+    background-size: 300% 300%;
+    animation: gradientFlow 22s ease-in-out infinite;
+  }
+
+  @keyframes gradientFlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .header-category {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: rgba(0, 160, 200, 0.75);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    color: #2a5a70;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(0, 200, 255, 0.25);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 160, 220, 0.10);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  /* ランク表示 */
+  .rank-card {
+    text-align: center;
+  }
+
+  .rank-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: rgba(0, 160, 200, 0.75);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .rank-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 28px;
+    border-radius: 999px;
+    color: #ffffff;
+    background: #808080;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    margin-bottom: 16px;
+  }
+
+  .rank-badge.rainbow {
+    background: linear-gradient(
+      90deg,
+      #ff5f6d, #ffc371, #f9f871, #7bed9f, #70a1ff, #b983ff, #ff5f6d
+    );
+    background-size: 300% 100%;
+    animation: rainbowSlide 4s linear infinite;
+    color: #ffffff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  }
+
+  @keyframes rainbowSlide {
+    from { background-position: 0% 50%; }
+    to   { background-position: 300% 50%; }
+  }
+
+  .rank-name {
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+  }
+
+  .rank-color-name {
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  .rank-total {
+    font-size: 15px;
+    color: #3a5a6c;
+    margin-bottom: 14px;
+  }
+
+  .rank-total strong {
+    font-weight: 400;
+    font-size: 20px;
+    color: #0d3a4e;
+  }
+
+  .progress-track {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(0, 160, 220, 0.12);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(100, 190, 225, 0.6), rgba(80, 170, 220, 0.95));
+    transition: width 0.6s ease;
+  }
+
+  .progress-bar.rainbow {
+    background: linear-gradient(
+      90deg,
+      #ff5f6d, #ffc371, #f9f871, #7bed9f, #70a1ff, #b983ff, #ff5f6d
+    );
+    background-size: 300% 100%;
+    animation: rainbowSlide 4s linear infinite;
+  }
+
+  .rank-next {
+    font-size: 12px;
+    color: rgba(80, 120, 145, 0.85);
+  }
+
+  /* 詳細リスト */
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 13px 2px;
+    border-bottom: 1px solid rgba(0, 180, 230, 0.12);
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+  }
+
+  .info-key {
+    flex-shrink: 0;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: rgba(0, 140, 185, 0.9);
+  }
+
+  .info-value {
+    text-align: right;
+    font-size: 15px;
+    color: #2a4a5c;
+    word-break: break-all;
+  }
+
+  .info-value .sub {
+    display: block;
+    font-size: 11px;
+    color: rgba(90, 130, 155, 0.8);
+    margin-top: 2px;
+  }
+
+  /* ランク一覧 */
+  .rank-list-title {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: #2a5a70;
+    margin-bottom: 12px;
+  }
+
+  .rank-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  .rank-row.current {
+    background: rgba(0, 190, 240, 0.10);
+    box-shadow: 0 0 0 1px rgba(0, 190, 240, 0.25) inset;
+  }
+
+  .rank-dot {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  }
+
+  .rank-dot.rainbow {
+    background: linear-gradient(
+      90deg, #ff5f6d, #ffc371, #f9f871, #7bed9f, #70a1ff, #b983ff
+    );
+  }
+
+  .rank-row-name {
+    flex: 1;
+    color: #2a4a5c;
+  }
+
+  .rank-row-range {
+    font-size: 12px;
+    color: rgba(90, 130, 155, 0.9);
+  }
+
+  .rank-row-you {
+    display: none;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: rgba(0, 150, 200, 0.95);
+  }
+
+  .rank-row.current .rank-row-you {
+    display: inline;
+  }
+
+  .note {
+    font-size: 12px;
+    line-height: 1.8;
+    color: rgba(90, 125, 150, 0.9);
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body,
+    .rank-badge.rainbow,
+    .progress-bar.rainbow {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .card {
+      padding: 18px;
+    }
+    .rank-name {
+      font-size: 20px;
+    }
+    h1 {
+      font-size: 24px;
+    }
+  }
+</style>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div class="header-category">User Info</div>
+      <h1>ユーザー情報</h1>
+    </header>
+
+    <!-- ランク -->
+    <section class="card rank-card">
+      <div class="rank-label">Rank</div>
+      <div>
+        <span class="rank-badge" id="rank-badge">
+          <span class="rank-name" id="rank-name">ゲスト</span>
+          <span class="rank-color-name" id="rank-color-name">灰色</span>
+        </span>
+      </div>
+      <p class="rank-total">
+        総合閲覧時間 <strong id="rank-total-time">0秒</strong>
+      </p>
+      <div class="progress-track">
+        <div class="progress-bar" id="rank-progress"></div>
+      </div>
+      <p class="rank-next" id="rank-next"></p>
+    </section>
+
+    <!-- 詳細 -->
+    <section class="card">
+      <div class="info-row">
+        <span class="info-key">初回閲覧時間</span>
+        <span class="info-value" id="first-visit">―</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">総合閲覧時間</span>
+        <span class="info-value">
+          <span id="total-time">―</span>
+          <span class="sub" id="total-time-sub"></span>
+        </span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">ランク</span>
+        <span class="info-value" id="info-rank">―</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">OS</span>
+        <span class="info-value" id="os">―</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">ブラウザ</span>
+        <span class="info-value" id="browser">―</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">言語</span>
+        <span class="info-value">
+          <span id="language">―</span>
+          <span class="sub" id="language-sub"></span>
+        </span>
+      </div>
+    </section>
+
+    <!-- ランク一覧 -->
+    <section class="card">
+      <h2 class="rank-list-title">ランク一覧</h2>
+      <div id="rank-list"></div>
+    </section>
+
+    <p class="note">
+      閲覧時間はこのブラウザのCookieに保存されます。<br>
+      Cookieを削除すると、初回閲覧時間と総合閲覧時間はリセットされます。
+    </p>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ---------- Cookieからのフォールバック読み取り ----------
+      // 通常は common.js の window.RyuheiViewingTime を使うが、
+      // 取得できない場合に備えてCookieを直接読む手段も用意する。
+      function readCookie(name) {
+        var prefix = name + '=';
+        var parts = document.cookie ? document.cookie.split(';') : [];
+        for (var i = 0; i < parts.length; i++) {
+          var item = parts[i].trim();
+          if (item.indexOf(prefix) === 0) {
+            try {
+              return decodeURIComponent(item.slice(prefix.length));
+            } catch (e) {
+              return item.slice(prefix.length);
+            }
+          }
+        }
+        return null;
+      }
+
+      var FALLBACK_RANKS = [
+        { name: 'ゲスト',        limitSeconds: 5 * 60,  color: '#808080', colorLabel: '灰色' },
+        { name: 'ビジター',      limitSeconds: 10 * 60, color: '#9acd32', colorLabel: '黄緑' },
+        { name: 'ビューアー',    limitSeconds: 15 * 60, color: '#87ceeb', colorLabel: '水色' },
+        { name: 'マスター',      limitSeconds: 20 * 60, color: '#9440d8', colorLabel: '紫' },
+        { name: '暇人',          limitSeconds: 30 * 60, color: '#c0c0c0', colorLabel: '銀色' },
+        { name: 'レジェンド',    limitSeconds: 60 * 60, color: '#e6b800', colorLabel: 'ゴールド' },
+        { name: 'アルティメット', limitSeconds: Infinity, color: null, colorLabel: 'レインボー', rainbow: true }
+      ];
+
+      function getViewingInfo() {
+        if (window.RyuheiViewingTime) {
+          var api = window.RyuheiViewingTime;
+          return {
+            firstVisitTime: api.getFirstVisitTime(),
+            totalSeconds: api.getTotalSeconds(),
+            rank: api.getRank(),
+            ranks: api.ranks,
+            formatDuration: api.formatDuration
+          };
+        }
+
+        var first = parseInt(readCookie('ryuheisudo_first_visit'), 10);
+        var total = parseInt(readCookie('ryuheisudo_total_seconds'), 10);
+        if (!isFinite(total) || total < 0) total = 0;
+
+        var rank = FALLBACK_RANKS[FALLBACK_RANKS.length - 1];
+        var rankIndex = FALLBACK_RANKS.length - 1;
+        for (var i = 0; i < FALLBACK_RANKS.length; i++) {
+          if (total < FALLBACK_RANKS[i].limitSeconds) {
+            rank = FALLBACK_RANKS[i];
+            rankIndex = i;
+            break;
+          }
+        }
+
+        return {
+          firstVisitTime: isFinite(first) && first > 0 ? first : null,
+          totalSeconds: total,
+          rank: {
+            index: rankIndex,
+            name: rank.name,
+            color: rank.color,
+            colorLabel: rank.colorLabel,
+            rainbow: Boolean(rank.rainbow),
+            secondsToNext: rank.limitSeconds === Infinity ? null : rank.limitSeconds - total,
+            nextRankName: rankIndex + 1 < FALLBACK_RANKS.length ? FALLBACK_RANKS[rankIndex + 1].name : null,
+            progress: 1
+          },
+          ranks: FALLBACK_RANKS,
+          formatDuration: function (sec) {
+            var h = Math.floor(sec / 3600);
+            var m = Math.floor((sec % 3600) / 60);
+            var s = sec % 60;
+            if (h > 0) return h + '時間 ' + m + '分 ' + s + '秒';
+            if (m > 0) return m + '分 ' + s + '秒';
+            return s + '秒';
+          }
+        };
+      }
+
+      // ---------- 日時フォーマット ----------
+      function pad(n) {
+        return String(n).padStart(2, '0');
+      }
+
+      function formatDateTime(ms) {
+        var d = new Date(ms);
+        return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 ' +
+          pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+      }
+
+      // ---------- OS判定 ----------
+      function detectOS() {
+        var ua = navigator.userAgent || '';
+
+        var ios = ua.match(/(?:iPhone|iPad|iPod).*?OS ([\d_]+)/);
+        if (ios) {
+          var device = /iPad/.test(ua) ? 'iPad' : (/iPod/.test(ua) ? 'iPod' : 'iPhone');
+          return 'iOS ' + ios[1].replace(/_/g, '.') + '（' + device + '）';
+        }
+        if (/Android/.test(ua)) {
+          var android = ua.match(/Android ([\d.]+)/);
+          return android ? 'Android ' + android[1] : 'Android';
+        }
+        if (/Windows NT/.test(ua)) {
+          var nt = ua.match(/Windows NT ([\d.]+)/);
+          var map = { '10.0': 'Windows 10 / 11', '6.3': 'Windows 8.1', '6.2': 'Windows 8', '6.1': 'Windows 7' };
+          return (nt && map[nt[1]]) ? map[nt[1]] : 'Windows';
+        }
+        if (/CrOS/.test(ua)) {
+          return 'ChromeOS';
+        }
+        if (/Mac OS X/.test(ua)) {
+          // iPadOSはデスクトップ表示でMacと同じUAになることがある
+          if (navigator.maxTouchPoints > 1 && /Safari/.test(ua) && !/Chrome/.test(ua)) {
+            return 'iPadOS（タブレット）';
+          }
+          var mac = ua.match(/Mac OS X ([\d_]+)/);
+          return mac ? 'macOS ' + mac[1].replace(/_/g, '.') : 'macOS';
+        }
+        if (/Linux/.test(ua)) {
+          return 'Linux';
+        }
+        return '不明';
+      }
+
+      // User-Agent Client Hints が使える場合はOSをより正確に上書きする
+      function refineOSWithClientHints() {
+        if (!navigator.userAgentData || !navigator.userAgentData.getHighEntropyValues) {
+          return;
+        }
+        navigator.userAgentData.getHighEntropyValues(['platform', 'platformVersion'])
+          .then(function (data) {
+            var el = document.getElementById('os');
+            if (!el || !data.platform) return;
+
+            if (data.platform === 'Windows') {
+              var major = parseInt((data.platformVersion || '0').split('.')[0], 10);
+              el.textContent = major >= 13 ? 'Windows 11' : 'Windows 10';
+            } else if (data.platform === 'macOS') {
+              el.textContent = data.platformVersion
+                ? 'macOS ' + data.platformVersion
+                : 'macOS';
+            } else if (data.platform === 'Android') {
+              el.textContent = data.platformVersion
+                ? 'Android ' + data.platformVersion
+                : 'Android';
+            } else if (data.platform === 'Chrome OS') {
+              el.textContent = 'ChromeOS';
+            } else if (data.platform === 'Linux') {
+              el.textContent = 'Linux';
+            }
+          })
+          .catch(function () {});
+      }
+
+      // ---------- ブラウザ判定 ----------
+      function detectBrowser() {
+        var ua = navigator.userAgent || '';
+        var m;
+
+        if ((m = ua.match(/Edg\/([\d.]+)/))) return 'Microsoft Edge ' + m[1];
+        if ((m = ua.match(/OPR\/([\d.]+)/))) return 'Opera ' + m[1];
+        if (/Opera/.test(ua)) return 'Opera';
+        if ((m = ua.match(/SamsungBrowser\/([\d.]+)/))) return 'Samsung Internet ' + m[1];
+        if ((m = ua.match(/Vivaldi\/([\d.]+)/))) return 'Vivaldi ' + m[1];
+        if ((m = ua.match(/YaBrowser\/([\d.]+)/))) return 'Yandex Browser ' + m[1];
+        if ((m = ua.match(/Firefox\/([\d.]+)/))) return 'Firefox ' + m[1];
+        if ((m = ua.match(/FxiOS\/([\d.]+)/))) return 'Firefox (iOS) ' + m[1];
+        if ((m = ua.match(/CriOS\/([\d.]+)/))) return 'Chrome (iOS) ' + m[1];
+        if ((m = ua.match(/Chrome\/([\d.]+)/))) return 'Chrome ' + m[1];
+        if (/Safari/.test(ua)) {
+          var v = ua.match(/Version\/([\d.]+)/);
+          return v ? 'Safari ' + v[1] : 'Safari';
+        }
+        return '不明';
+      }
+
+      // ---------- ランク一覧の描画 ----------
+      var RANGE_LABELS = [
+        '5分未満',
+        '5分 〜 10分未満',
+        '10分 〜 15分未満',
+        '15分 〜 20分未満',
+        '20分 〜 30分未満',
+        '30分 〜 60分未満',
+        '60分以上'
+      ];
+
+      function renderRankList(ranks, currentIndex) {
+        var list = document.getElementById('rank-list');
+        list.innerHTML = '';
+
+        ranks.forEach(function (rank, i) {
+          var row = document.createElement('div');
+          row.className = 'rank-row' + (i === currentIndex ? ' current' : '');
+
+          var dot = document.createElement('span');
+          dot.className = 'rank-dot' + (rank.rainbow ? ' rainbow' : '');
+          if (!rank.rainbow && rank.color) {
+            dot.style.background = rank.color;
+          }
+
+          var name = document.createElement('span');
+          name.className = 'rank-row-name';
+          name.textContent = rank.name;
+
+          var you = document.createElement('span');
+          you.className = 'rank-row-you';
+          you.textContent = 'YOU';
+
+          var range = document.createElement('span');
+          range.className = 'rank-row-range';
+          range.textContent = RANGE_LABELS[i] || '';
+
+          row.appendChild(dot);
+          row.appendChild(name);
+          row.appendChild(you);
+          row.appendChild(range);
+          list.appendChild(row);
+        });
+      }
+
+      // ---------- 画面更新 ----------
+      function render() {
+        var info = getViewingInfo();
+        var rank = info.rank;
+
+        // 初回閲覧時間
+        document.getElementById('first-visit').textContent =
+          info.firstVisitTime ? formatDateTime(info.firstVisitTime) : '―';
+
+        // 総合閲覧時間
+        var totalText = info.formatDuration(info.totalSeconds);
+        document.getElementById('total-time').textContent = totalText;
+        document.getElementById('total-time-sub').textContent =
+          '（合計 ' + info.totalSeconds.toLocaleString('ja-JP') + ' 秒）';
+        document.getElementById('rank-total-time').textContent = totalText;
+
+        // ランク
+        var badge = document.getElementById('rank-badge');
+        document.getElementById('rank-name').textContent = rank.name;
+        document.getElementById('rank-color-name').textContent = rank.colorLabel;
+        document.getElementById('info-rank').textContent =
+          rank.name + '（' + rank.colorLabel + '）';
+
+        if (rank.rainbow) {
+          badge.classList.add('rainbow');
+          badge.style.background = '';
+        } else {
+          badge.classList.remove('rainbow');
+          badge.style.background = rank.color || '#808080';
+        }
+
+        // 次のランクまで
+        var progress = document.getElementById('rank-progress');
+        var next = document.getElementById('rank-next');
+        if (rank.rainbow) {
+          progress.classList.add('rainbow');
+          progress.style.width = '100%';
+        } else {
+          progress.classList.remove('rainbow');
+          progress.style.width = Math.round((rank.progress || 0) * 100) + '%';
+        }
+
+        if (rank.secondsToNext === null || !rank.nextRankName) {
+          next.textContent = '最高ランクに到達しています';
+        } else {
+          next.textContent =
+            '次のランク「' + rank.nextRankName + '」まで あと ' +
+            info.formatDuration(rank.secondsToNext);
+        }
+
+        renderRankList(info.ranks, rank.index);
+      }
+
+      function renderDeviceInfo() {
+        document.getElementById('os').textContent = detectOS();
+        document.getElementById('browser').textContent = detectBrowser();
+
+        var language = navigator.language || '不明';
+        document.getElementById('language').textContent = language;
+        if (navigator.languages && navigator.languages.length > 1) {
+          document.getElementById('language-sub').textContent =
+            '優先順: ' + navigator.languages.join(', ');
+        }
+
+        refineOSWithClientHints();
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        renderDeviceInfo();
+        render();
+        // 総合閲覧時間とランクを1秒ごとにライブ更新する
+        setInterval(render, 1000);
+      });
+    })();
+  </script>
+</body>
+</html>

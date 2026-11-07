@@ -4,6 +4,182 @@ document.addEventListener('DOMContentLoaded', () => {
   const currentPage = location.pathname.split('/').pop() || 'index.html';
 
   // =========================================
+  // 閲覧時間の測定（Cookie）
+  // =========================================
+  // Cookieに保存するもの:
+  //   ryuheisudo_first_visit    : 初回閲覧日時（Unix時間・ミリ秒）
+  //   ryuheisudo_total_seconds  : 総合閲覧時間（秒）
+  // ページを開いている間、表示中（タブが前面）のときだけ
+  // 1秒ごとに総合閲覧時間へ加算する。
+  // user.html からは window.RyuheiViewingTime で参照できる。
+
+  const VIEW_COOKIE_FIRST = 'ryuheisudo_first_visit';
+  const VIEW_COOKIE_TOTAL = 'ryuheisudo_total_seconds';
+  const VIEW_COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 10; // 10年
+
+  function getViewCookie(name) {
+    const prefix = `${name}=`;
+    const parts = document.cookie ? document.cookie.split(';') : [];
+
+    for (const part of parts) {
+      const item = part.trim();
+      if (item.startsWith(prefix)) {
+        try {
+          return decodeURIComponent(item.slice(prefix.length));
+        } catch (_) {
+          return item.slice(prefix.length);
+        }
+      }
+    }
+
+    return null;
+  }
+
+  function setViewCookie(name, value) {
+    document.cookie =
+      `${name}=${encodeURIComponent(String(value))}` +
+      `; max-age=${VIEW_COOKIE_MAX_AGE}; path=/; SameSite=Lax`;
+  }
+
+  // ランク定義（総合閲覧時間が limitSeconds 未満ならそのランク）
+  // 最後のアルティメットは60分以上（ユーザー決定: 60分台の隙間を作らない）
+  const VIEW_RANKS = [
+    { name: 'ゲスト',       limitSeconds: 5 * 60,  color: '#808080', colorLabel: '灰色' },
+    { name: 'ビジター',     limitSeconds: 10 * 60, color: '#9acd32', colorLabel: '黄緑' },
+    { name: 'ビューアー',   limitSeconds: 15 * 60, color: '#87ceeb', colorLabel: '水色' },
+    { name: 'マスター',     limitSeconds: 20 * 60, color: '#9440d8', colorLabel: '紫' },
+    { name: '暇人',         limitSeconds: 30 * 60, color: '#c0c0c0', colorLabel: '銀色' },
+    { name: 'レジェンド',   limitSeconds: 60 * 60, color: '#e6b800', colorLabel: 'ゴールド' },
+    { name: 'アルティメット', limitSeconds: Infinity, color: null, colorLabel: 'レインボー', rainbow: true }
+  ];
+
+  function getViewRank(totalSeconds) {
+    const seconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+
+    for (let i = 0; i < VIEW_RANKS.length; i++) {
+      if (seconds < VIEW_RANKS[i].limitSeconds) {
+        const rank = VIEW_RANKS[i];
+        const prevLimit = i === 0 ? 0 : VIEW_RANKS[i - 1].limitSeconds;
+
+        return {
+          index: i,
+          name: rank.name,
+          color: rank.color,
+          colorLabel: rank.colorLabel,
+          rainbow: Boolean(rank.rainbow),
+          // 次のランクまでの残り秒数（最高ランクでは null）
+          secondsToNext: rank.limitSeconds === Infinity
+            ? null
+            : rank.limitSeconds - seconds,
+          nextRankName: i + 1 < VIEW_RANKS.length ? VIEW_RANKS[i + 1].name : null,
+          // 現在のランク内での進み具合（0〜1、次のランク判定用）
+          progress: rank.limitSeconds === Infinity
+            ? 1
+            : (seconds - prevLimit) / (rank.limitSeconds - prevLimit)
+        };
+      }
+    }
+
+    const last = VIEW_RANKS[VIEW_RANKS.length - 1];
+    return {
+      index: VIEW_RANKS.length - 1,
+      name: last.name,
+      color: last.color,
+      colorLabel: last.colorLabel,
+      rainbow: true,
+      secondsToNext: null,
+      nextRankName: null,
+      progress: 1
+    };
+  }
+
+  function formatViewDuration(totalSeconds) {
+    const seconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+
+    if (h > 0) {
+      return `${h}時間 ${m}分 ${s}秒`;
+    }
+    if (m > 0) {
+      return `${m}分 ${s}秒`;
+    }
+    return `${s}秒`;
+  }
+
+  // 初回閲覧日時（なければ今を初回として保存する）
+  let firstVisitTime = parseInt(getViewCookie(VIEW_COOKIE_FIRST), 10);
+
+  if (!Number.isFinite(firstVisitTime) || firstVisitTime <= 0) {
+    firstVisitTime = Date.now();
+  }
+  setViewCookie(VIEW_COOKIE_FIRST, firstVisitTime);
+
+  // 総合閲覧時間（秒）
+  let totalViewSeconds = parseInt(getViewCookie(VIEW_COOKIE_TOTAL), 10);
+
+  if (!Number.isFinite(totalViewSeconds) || totalViewSeconds < 0) {
+    totalViewSeconds = 0;
+  }
+
+  let unsavedViewSeconds = 0;
+
+  function saveViewingTime() {
+    setViewCookie(VIEW_COOKIE_FIRST, firstVisitTime);
+    setViewCookie(VIEW_COOKIE_TOTAL, totalViewSeconds);
+    unsavedViewSeconds = 0;
+  }
+
+  saveViewingTime();
+
+  // 1秒ごとに加算する。裏側のタブでは数えない。
+  setInterval(() => {
+    if (document.hidden) {
+      return;
+    }
+
+    totalViewSeconds += 1;
+    unsavedViewSeconds += 1;
+
+    // Cookieへの書き込みは5秒に1回に抑える
+    if (unsavedViewSeconds >= 5) {
+      saveViewingTime();
+    }
+
+    document.dispatchEvent(new CustomEvent('ryuhei-viewing-time', {
+      detail: {
+        firstVisitTime,
+        totalSeconds: totalViewSeconds
+      }
+    }));
+  }, 1000);
+
+  // ページを離れる・タブを隠すときに未保存分を保存する
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      saveViewingTime();
+    }
+  });
+  window.addEventListener('pagehide', saveViewingTime);
+  window.addEventListener('beforeunload', saveViewingTime);
+
+  // user.html など他処理から参照するための公開API
+  window.RyuheiViewingTime = {
+    cookieFirst: VIEW_COOKIE_FIRST,
+    cookieTotal: VIEW_COOKIE_TOTAL,
+    ranks: VIEW_RANKS,
+    getFirstVisitTime: () => firstVisitTime,
+    getTotalSeconds: () => totalViewSeconds,
+    getRank: (seconds) => getViewRank(
+      seconds === undefined ? totalViewSeconds : seconds
+    ),
+    formatDuration: formatViewDuration,
+    save: saveViewingTime
+  };
+
+
+  // =========================================
   // ホームボタン（トップページでは表示しない）
   // =========================================
 
