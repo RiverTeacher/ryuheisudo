@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="author" content="須藤龍平">
+<title>資格 | 須藤龍平</title>
+<script src="common.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-jp@latest/japanese-400-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-jp@latest/japanese-300-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/share-tech-mono@latest/latin-400-normal.css">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    color: #3a4a5c;
+    min-height: 100vh;
+    padding: 72px 16px 48px;
+    background: linear-gradient(
+      120deg,
+      #ffffff 0%,
+      #eaf6fc 20%,
+      #ffffff 40%,
+      #e3f2fa 60%,
+      #ffffff 80%,
+      #eef8fd 100%
+    );
+    background-size: 300% 300%;
+    animation: gradientFlow 22s ease-in-out infinite;
+  }
+
+  @keyframes gradientFlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .header-category {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: rgba(0, 160, 200, 0.75);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    color: #2a5a70;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(0, 200, 255, 0.25);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 160, 220, 0.10);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  /* 資格リスト */
+  .qual-row {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 15px 2px;
+    border-bottom: 1px solid rgba(0, 180, 230, 0.12);
+  }
+
+  .qual-row:last-child {
+    border-bottom: none;
+  }
+
+  .qual-date {
+    flex-shrink: 0;
+    width: 92px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: rgba(0, 140, 185, 0.9);
+  }
+
+  .qual-name {
+    flex: 1;
+    font-size: 15px;
+    color: #2a4a5c;
+  }
+
+  .qual-status {
+    flex-shrink: 0;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    color: #ffffff;
+    background: rgba(0, 160, 200, 0.85);
+  }
+
+  .qual-status.doing {
+    background: rgba(230, 160, 40, 0.95);
+  }
+
+  /* ロック表示 */
+  .locked-card {
+    text-align: center;
+  }
+
+  .locked-icon {
+    font-size: 34px;
+    margin-bottom: 12px;
+  }
+
+  .locked-title {
+    font-size: 17px;
+    font-weight: 400;
+    color: #2a5a70;
+    margin-bottom: 10px;
+  }
+
+  .locked-text {
+    font-size: 13px;
+    line-height: 1.9;
+    color: rgba(80, 115, 140, 0.95);
+    margin-bottom: 18px;
+  }
+
+  .locked-rank {
+    display: inline-block;
+    padding: 5px 16px;
+    border-radius: 999px;
+    color: #ffffff;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .progress-track {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(0, 160, 220, 0.12);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(154, 205, 50, 0.55), rgba(154, 205, 50, 0.95));
+    transition: width 0.6s ease;
+  }
+
+  .locked-remain {
+    font-size: 12px;
+    color: rgba(80, 120, 145, 0.85);
+  }
+
+  .user-link {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 13px;
+    color: rgba(0, 140, 190, 0.95);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 140, 190, 0.4);
+    padding-bottom: 1px;
+  }
+
+  .note {
+    font-size: 12px;
+    line-height: 1.8;
+    color: rgba(90, 125, 150, 0.9);
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .card {
+      padding: 18px;
+    }
+    h1 {
+      font-size: 24px;
+    }
+    .qual-row {
+      flex-wrap: wrap;
+      gap: 6px 12px;
+    }
+    .qual-date {
+      width: auto;
+    }
+  }
+</style>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div class="header-category">Qualifications</div>
+      <h1>資格</h1>
+    </header>
+
+    <!-- ロック中（ゲスト）の表示 -->
+    <section class="card locked-card" id="locked-view" hidden>
+      <div class="locked-icon" aria-hidden="true">🔒</div>
+      <h2 class="locked-title">このページはロックされています</h2>
+      <p class="locked-text">
+        資格ページは、ランクが<strong>ビジター以上</strong>で閲覧できます。<br>
+        このサイトを合計5分以上見るとビジターになります。
+      </p>
+      <div>
+        <span class="locked-rank" id="current-rank">ゲスト</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-bar" id="unlock-progress"></div>
+      </div>
+      <p class="locked-remain" id="unlock-remain"></p>
+      <a class="user-link" href="user.html">現在の閲覧時間とランクを見る</a>
+    </section>
+
+    <!-- 解放後（ビジター以上）の表示 -->
+    <section class="card" id="content-view" hidden>
+      <div class="qual-row">
+        <span class="qual-date">2024/07/12</span>
+        <span class="qual-name">実用英語技能検定 2級</span>
+        <span class="qual-status">取得</span>
+      </div>
+      <div class="qual-row">
+        <span class="qual-date">2026/02～</span>
+        <span class="qual-name">普通自動車免許（AT限定）</span>
+        <span class="qual-status doing">取得中…</span>
+      </div>
+    </section>
+
+    <p class="note" id="unlocked-note" hidden>
+      ランク「ビジター」以上で解放されるページです。
+    </p>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ビジターの条件: 総合閲覧時間 5分（300秒）以上
+      var UNLOCK_SECONDS = 5 * 60;
+      var UNLOCK_RANK_NAME = 'ビジター';
+
+      function readCookie(name) {
+        var prefix = name + '=';
+        var parts = document.cookie ? document.cookie.split(';') : [];
+        for (var i = 0; i < parts.length; i++) {
+          var item = parts[i].trim();
+          if (item.indexOf(prefix) === 0) {
+            try {
+              return decodeURIComponent(item.slice(prefix.length));
+            } catch (e) {
+              return item.slice(prefix.length);
+            }
+          }
+        }
+        return null;
+      }
+
+      function getViewingInfo() {
+        if (window.RyuheiViewingTime) {
+          var api = window.RyuheiViewingTime;
+          return {
+            totalSeconds: api.getTotalSeconds(),
+            rank: api.getRank(),
+            formatDuration: api.formatDuration
+          };
+        }
+
+        // common.js のAPIが使えない場合のフォールバック（Cookie直読み）
+        var total = parseInt(readCookie('ryuheisudo_total_seconds'), 10);
+        if (!isFinite(total) || total < 0) total = 0;
+        return {
+          totalSeconds: total,
+          rank: { name: total >= UNLOCK_SECONDS ? UNLOCK_RANK_NAME : 'ゲスト', color: '#808080' },
+          formatDuration: function (sec) {
+            var m = Math.floor(sec / 60);
+            var s = sec % 60;
+            if (m > 0) return m + '分 ' + s + '秒';
+            return s + '秒';
+          }
+        };
+      }
+
+      function render() {
+        var info = getViewingInfo();
+        var unlocked = info.totalSeconds >= UNLOCK_SECONDS;
+
+        var lockedView = document.getElementById('locked-view');
+        var contentView = document.getElementById('content-view');
+        var note = document.getElementById('unlocked-note');
+
+        contentView.hidden = !unlocked;
+        note.hidden = !unlocked;
+        lockedView.hidden = unlocked;
+
+        if (!unlocked) {
+          var badge = document.getElementById('current-rank');
+          badge.textContent = '現在のランク: ' + info.rank.name;
+          badge.style.background = info.rank.rainbow
+            ? '#b983ff'
+            : (info.rank.color || '#808080');
+
+          var remain = UNLOCK_SECONDS - info.totalSeconds;
+          document.getElementById('unlock-progress').style.width =
+            Math.min(100, Math.floor(info.totalSeconds / UNLOCK_SECONDS * 100)) + '%';
+          document.getElementById('unlock-remain').textContent =
+            'ビジターまで あと ' + info.formatDuration(remain) +
+            '（現在の総合閲覧時間: ' + info.formatDuration(info.totalSeconds) + '）' +
+            ' ― このページを開いたままでもカウントは進みます';
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        render();
+        // 閲覧時間が伸びてビジターに達したら、その場で自動で解放する
+        setInterval(render, 1000);
+      });
+    })();
+  </script>
+</body>
+</html>
