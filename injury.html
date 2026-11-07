@@ -561,7 +561,7 @@ footer{
 
     box.innerHTML = actives.map(function (inf) {
       var e = endDate(inf);
-      var until = e ? "外出制限解除まで" + fmtDate(e) + "" : "期限未定";
+      var until = e ? "外出制限解除:  " + fmtDate(e) + "" : "期限未定";
       var remain = e ? fmtRemain(e.getTime() - Date.now()) : "";
       var cmt = inf.comment ? '<p class="inf-comment">' + escapeHtml(inf.comment) + "</p>" : "";
 
