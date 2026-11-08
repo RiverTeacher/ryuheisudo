@@ -4,3 +4,4 @@ Disallow: /
 Allow: /$
 Allow: /index.html
 Disallow: /image/
+Disallow: /icon.ico
