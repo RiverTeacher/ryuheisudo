@@ -356,6 +356,10 @@
           <span class="sub" id="language-sub"></span>
         </span>
       </div>
+      <div class="info-row">
+        <span class="info-key">IPバージョン</span>
+        <span class="info-value" id="ip-version">判定中…</span>
+      </div>
     </section>
 
     <!-- ランク一覧 -->
@@ -650,6 +654,52 @@
         renderRankList(info.ranks, rank.index);
       }
 
+      // ---------- IPv4 / IPv6 判定 ----------
+      // IP確認用の外部サービス（IPv4/IPv6両対応）へ実際に接続し、
+      // 接続に使われたアドレスの形式で判定する
+      function fetchJsonWithTimeout(url, timeoutMs) {
+        var controller = new AbortController();
+        var timer = setTimeout(function () { controller.abort(); }, timeoutMs);
+        return fetch(url, { signal: controller.signal, cache: 'no-store' })
+          .then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+          .finally(function () { clearTimeout(timer); });
+      }
+
+      function detectIPVersion() {
+        var el = document.getElementById('ip-version');
+        if (!el) return;
+
+        function show(version) {
+          el.textContent = version === 'IPv6' ? 'IPv6 😆' : 'IPv4 😢';
+        }
+
+        // 第1候補: api64.ipify.org（返ってきたIPに「:」が含まれればIPv6）
+        fetchJsonWithTimeout('https://api64.ipify.org?format=json', 6000)
+          .then(function (data) {
+            if (!data || !data.ip) throw new Error('no ip');
+            show(data.ip.indexOf(':') !== -1 ? 'IPv6' : 'IPv4');
+          })
+          .catch(function () {
+            // 第2候補: ipapi.co（versionフィールドで判定）
+            return fetchJsonWithTimeout('https://ipapi.co/json/', 6000)
+              .then(function (data) {
+                if (data && data.version) {
+                  show(data.version);
+                } else if (data && data.ip) {
+                  show(data.ip.indexOf(':') !== -1 ? 'IPv6' : 'IPv4');
+                } else {
+                  throw new Error('no version');
+                }
+              });
+          })
+          .catch(function () {
+            el.textContent = '判定できませんでした';
+          });
+      }
+
       function renderDeviceInfo() {
         document.getElementById('os').textContent = detectOS();
         document.getElementById('browser').textContent = detectBrowser();
@@ -662,6 +712,7 @@
         }
 
         refineOSWithClientHints();
+        detectIPVersion();
       }
 
       document.addEventListener('DOMContentLoaded', function () {
