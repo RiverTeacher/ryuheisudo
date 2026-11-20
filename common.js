@@ -194,6 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     button.className = 'common-home-button';
 
     button.innerHTML = `
+      <div class="common-home-hint">長押し</div>
       <div class="common-home-label">
         <span class="common-home-arrow">←</span>
         <span>トップへ</span>
@@ -218,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         z-index: 99999;
 
         min-width: 110px;
-        padding: 9px 14px 8px;
+        padding: 7px 14px 8px;
 
         color: rgba(70, 95, 110, 0.85);
         background: rgba(255, 255, 255, 0.55);
@@ -257,6 +258,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
       .common-home-button:active {
         transform: scale(0.97);
+      }
+
+      .common-home-hint {
+        position: relative;
+        z-index: 2;
+
+        margin-bottom: 2px;
+
+        font-size: 9px;
+        font-weight: 400;
+        letter-spacing: 0.4em;
+        padding-left: 0.4em;
+        line-height: 1.3;
+        text-align: center;
+
+        color: rgba(0, 145, 190, 0.8);
+
+        white-space: nowrap;
       }
 
       .common-home-label {
